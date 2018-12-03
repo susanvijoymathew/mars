@@ -1,0 +1,40 @@
+
+body {
+	background-color: #eeeeee;
+	font-family: sans-serif;
+	margin: 20px;
+}
+
+.mcdHeader {
+	display: block;
+	padding: 50px;
+	background-color: #8A0808;
+	color: #FFBF00;
+	text-align:center;
+	font-size: 30px;
+}
+
+table, th, td {
+    border: #1px solid black;
+    border-collapse: collapse;
+}
+
+table#PromoTable th{
+	background-color: #8A0808;
+	color: #FFBF00; 
+}
+
+table#PromoTable tr:nth-child(even) {
+    background-color: #A4A4A4; // #A4A4A4
+}
+
+table#PromoTable tr:nth-child(odd) {
+   background-color: #FFFFFF;
+}
+
+
+label {
+	display: inline-block;
+	width: 120px;
+	text-align: right;
+}

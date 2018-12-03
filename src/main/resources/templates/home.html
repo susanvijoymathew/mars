@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>McDonalds Activity Reporting System</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+
+<body>
+    <h2 class="mcdHeader">McDonalds Activity Reporting System</h2>
+    
+    <form method="POST" th:action="@{/filter}" th:object="${filterForm}" >
+        <label for="startDate">Start Date: </label><input type="date" name="startDate" />&nbsp;
+        <label for="endDate">End Date: </label><input type="date" name="endDate" />&nbsp;
+        <label for="location">Area: </label>&nbsp;
+        <select th:field="*{location}">
+            <option th:each="loc : ${locations}"
+        	    th:value="${loc.id}" th:text="${loc.name}" >
+            </option>
+        </select>
+        <input type="submit" value="Apply Filter" />
+    </form>
+    
+    <table id="PromoTable" style="width:95%" >
+      <thead>
+        <tr>
+          <th>Promotion</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Area</th>
+          <th>Product</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="restPromo : ${restaurantPromotionList}">
+          <td th:text="${restPromo.promotion.name}">promotion name</td>
+          <td th:text="${#dates.format(restPromo.promotion.startDate, 'MM-dd-yyyy')}"></td>
+          <td th:text="${#dates.format(restPromo.promotion.endDate, 'MM-dd-yyyy')}"></td>
+          <td th:text="${restPromo.area.name}">city</td>
+          <td th:text="${restPromo.product.name}">product</td>
+        </tr>
+      </tbody>
+    </table>
+</body>
+</html>
