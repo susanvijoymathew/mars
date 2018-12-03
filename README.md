@@ -1,5 +1,5 @@
 # mars
-This is a fascimile of McDonald's Activity Reporting System or MARS that McDonald's Corporation's Marketing team owns. This web program was created as a personal web-development project.
+This is a replica of McDonald's Activity Reporting System or MARS that McDonald's Corporation's Marketing team owns. This web program was created as a personal web-development project.
 
 Currently, this program is at phase one which is to display all the promotions available.
 
