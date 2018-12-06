@@ -3,13 +3,16 @@ package com.mcd.mars.data.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="User_Details")
 public class User {
-    @Id @Column @GeneratedValue private long id;
+    @Id @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     @Column private String firstName;
     @Column private String lastName;
     @Column private String emailAddress;
