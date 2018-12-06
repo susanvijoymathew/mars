@@ -2,34 +2,38 @@ package com.mcd.mars.business;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 public class FilterForm {
-	Date startDate;
-	Date endDate;
+	@NotNull(message="Please enter a date in MM/dd/YYYY format.")
+	private String startDate;
+	@NotNull(message="Please enter a date in MM/dd/YYYY format.")
+	private String endDate;
 	long location;
 	
 	public FilterForm() {
 		this(null, null, -1);
 	}
 	
-	public FilterForm(Date startDate, Date endDate, long place) {
+	public FilterForm(String startDate, String endDate, long place) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.location = place;
 	}
 
-	public Date getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 
