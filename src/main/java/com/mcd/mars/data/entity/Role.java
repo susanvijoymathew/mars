@@ -3,11 +3,14 @@ package com.mcd.mars.data.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class Role {
-	@Id @Column @GeneratedValue  private long id;
+	@Id @Column
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 	@Column private String role;
 	
 	public Role() {
