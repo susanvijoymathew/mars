@@ -45,15 +45,6 @@ public class RestaurantPromotionController {
 		if (!model.containsAttribute("restaurantPromotionList"))
 			model.addAttribute( promotionService.getAllPromotions() );
 		
-		/*
-		List<com.mcd.mars.data.entity.Area> allAreas = promotionService.getAllAreas();
-		System.out.println("Printing the areas retrieved from Database");
-		String space = "    ";
-		for (com.mcd.mars.data.entity.Area a: allAreas) {
-			String spaces = (new String(new char[a.getLevel()]).replace("\0", space));
-			System.out.println(spaces + a);
-		}
-		*/
 		return "home";
 	}
 	
@@ -63,14 +54,14 @@ public class RestaurantPromotionController {
 		try {
 			sDate = MarsDataUtility.getAsDate(filterForm.getStartDate());
 		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM/DD/YYYY format (example, 01/20/2018).");
+			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 01-20-2018).");
 		}
 
 		Date eDate = null;
 		try {
 			eDate = MarsDataUtility.getAsDate(filterForm.getEndDate());
 		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM/DD/YYYY format (example, 12/03/2018).");
+			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 12-03-2018).");
 		}
 		
 		if (eDate.before(sDate)) {
@@ -97,14 +88,14 @@ public class RestaurantPromotionController {
 		try {
 			sDate = MarsDataUtility.getAsDate(promoForm.getStartDate());
 		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM/DD/YYYY format (example, 01/20/2018).");
+			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 01-20-2018).");
 		}
 
 		Date eDate = null;
 		try {
 			eDate = MarsDataUtility.getAsDate(promoForm.getEndDate());
 		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM/DD/YYYY format (example, 12/03/2018).");
+			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 12-03-2018).");
 		}
 		
 		if (eDate.before(sDate)) {
