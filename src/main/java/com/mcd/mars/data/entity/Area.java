@@ -3,13 +3,16 @@ package com.mcd.mars.data.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Area {
-	@Id @Column @GeneratedValue private long id;
+public class Area implements Comparable<Area> {
+	@Id @Column
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 	@Column private String name;
 
 	// This should actually be an enumeration.
@@ -47,7 +50,8 @@ public class Area {
 	
 	public Area getParent() { return parent; }
 	public void setParent(Area parent) { this.parent = parent; }
-/*
+
+	/*
 	public Collection<Area> getChildren() {
 		return children;
 	}
@@ -56,9 +60,16 @@ public class Area {
 		this.children = children;
 	}
 	*/
+	
 	@Override
 	public String toString() {
 		long pId = (parent != null) ? parent.getId() : -1;
 		return "Area - [id: " + id + ", name: " + name + ", type: " + type + ", parentId: " + pId + "]";
+	}
+
+	@Override
+	public int compareTo(Area o) {
+		// TODO Auto-generated method stub
+		return (int) (this.getParent().getId() - o.getParent().getId());
 	}
 }
