@@ -11,10 +11,10 @@ public class PromotionForm {
 	@Positive(message="Please select a product for this promotion.")
 	private long product;
 	
-	@NotNull(message="Please enter a date in MM/dd/YYYY format.")
+	@NotNull(message="Please enter a date in MM-dd-YYYY format.")
 	private String startDate;
 	
-	@NotNull(message="Please enter a date in MM/dd/YYYY format.")
+	@NotNull(message="Please enter a date in MM-dd-YYYY format.")
 	private String endDate;
 	
 	@NotBlank(message="Promotion name cannot be empty.")
