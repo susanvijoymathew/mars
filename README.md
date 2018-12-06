@@ -3,6 +3,10 @@ This is a replica of McDonald's Activity Reporting System or MARS that McDonald'
 
 Currently, this program is at phase one which is to display all the promotions available.
 
-Phase two is to display only "active" promotions and to create new promotions.
+Phase two
+Create new promotions.
+Edit an existing promotion.
+Only show children of USA in the Area drop down.
+Display only "active" promotions.
 
-Phase three is to restrict promotion creation and view based on user criteria (role and area).
+Phase three is to restrict promotion creation/modification and view based on user criteria (role and area).
