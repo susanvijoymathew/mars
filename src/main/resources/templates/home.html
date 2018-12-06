@@ -9,37 +9,62 @@
 <body>
     <h2 class="mcdHeader">McDonalds Activity Reporting System</h2>
     
-    <form method="POST" th:action="@{/filter}" th:object="${filterForm}" >
-        <label for="startDate">Start Date: </label><input type="date" name="startDate" />&nbsp;
-        <label for="endDate">End Date: </label><input type="date" name="endDate" />&nbsp;
-        <label for="location">Area: </label>&nbsp;
-        <select th:field="*{location}">
-            <option th:each="loc : ${locations}"
-        	    th:value="${loc.id}" th:text="${loc.name}" >
-            </option>
-        </select>
-        <input type="submit" value="Apply Filter" />
-    </form>
+    <div class="smallgap" th:unless="${#lists.isEmpty(restaurantPromotionList)}">
+	    <form method="POST" th:action="@{/mars/filter}" th:object="${filterForm}" >
+	        <label for="startDate">Start Date: </label><input type="text" name="startDate" />&nbsp;
+	        <label for="endDate">End Date: </label><input type="text" name="endDate" />&nbsp;
+	        <label for="location">Area: </label>&nbsp;
+	        <select th:field="*{location}">
+	            <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name}" ></option>
+	        </select>
+	        <input type="submit" value="Apply Filter" />
+	    </form>
+	    
+	    <!-- <table id="PromoTable" style="width:95%" > -->
+	    <table id="PromoTable>
+	      <thead>
+	        <tr>
+	          <th>Promotion</th>
+	          <th>Start Date</th>
+	          <th>End Date</th>
+	          <th>Area</th>
+	          <th>Product</th>
+	        </tr>
+	      </thead>
+	      <tbody>
+	        <tr th:each="restPromo : ${restaurantPromotionList}">
+	          <td th:text="${restPromo.promotion.name}">promotion name</td>
+	          <td th:text="${#dates.format(restPromo.promotion.startDate, 'MM-dd-yyyy')}"></td>
+	          <td th:text="${#dates.format(restPromo.promotion.endDate, 'MM-dd-yyyy')}"></td>
+	          <td th:text="${restPromo.area.name}">city</td>
+	          <td th:text="${restPromo.product.name}">product</td>
+	        </tr>
+	      </tbody>
+	    </table>
+    </div>
     
-    <table id="PromoTable" style="width:95%" >
-      <thead>
-        <tr>
-          <th>Promotion</th>
-          <th>Start Date</th>
-          <th>End Date</th>
-          <th>Area</th>
-          <th>Product</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="restPromo : ${restaurantPromotionList}">
-          <td th:text="${restPromo.promotion.name}">promotion name</td>
-          <td th:text="${#dates.format(restPromo.promotion.startDate, 'MM-dd-yyyy')}"></td>
-          <td th:text="${#dates.format(restPromo.promotion.endDate, 'MM-dd-yyyy')}"></td>
-          <td th:text="${restPromo.area.name}">city</td>
-          <td th:text="${restPromo.product.name}">product</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="smallgap">
+    <form method="POST" th:action="@{/mars/create}" th:object="${promotionForm}" >
+        <ul th:if="${#fields.hasErrors('*')}">
+            <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
+        </ul>
+
+	    <label for="name">Promotion Name: </label><input type="text" th:field="*{name}" /><br />
+	    <label for="description">Promotion Description: </label><input type="text" th:field="*{description}" /><br />
+	    <label for="startDate">Start Date (MM-DD-YYYY): </label><input type="text" th:field="*{startDate}" /><br />
+	    <label for="endDate">End Date (MM-DD-YYYY): </label><input type="text" th:field="*{endDate}" /><br />
+	    <label for="area">Area: </label>
+	    <select th:field="*{area}">
+	        <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name}" ></option>
+	    </select>
+	    <br />
+	    <label for="product">Product: </label>
+	    <select th:field="*{product}">
+	        <option th:each="prdct : ${products}" th:value="${prdct.id}" th:text="${prdct.name}" ></option>
+	    </select>
+	    <br />
+	    <input type="submit" value="Save" />
+    </form>
+    </div>
 </body>
 </html>
