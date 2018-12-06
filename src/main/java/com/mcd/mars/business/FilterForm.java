@@ -1,7 +1,5 @@
 package com.mcd.mars.business;
 
-import java.util.Date;
-
 import javax.validation.constraints.NotNull;
 
 public class FilterForm {
