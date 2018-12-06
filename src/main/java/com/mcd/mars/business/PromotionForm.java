@@ -1,13 +1,9 @@
 package com.mcd.mars.business;
 
-import java.util.Date;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 public class PromotionForm {
 	@Positive(message="Please select an area for this promotion.")
