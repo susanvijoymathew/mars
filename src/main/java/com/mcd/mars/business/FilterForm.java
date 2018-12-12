@@ -1,45 +1,49 @@
 package com.mcd.mars.business;
 
-import javax.validation.constraints.NotNull;
+import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 public class FilterForm {
-	@NotNull(message="Please enter a date in MM-dd-YYYY format.")
-	private String startDate;
-	@NotNull(message="Please enter a date in MM-dd-YYYY format.")
-	private String endDate;
-	long location;
+	@DateTimeFormat(pattern="MM-dd-yyyy")
+	private Date startDate;
+	
+	@DateTimeFormat(pattern="MM-dd-yyyy")
+	private Date endDate;
+	
+	private long area;
 	
 	public FilterForm() {
 		this(null, null, -1);
 	}
 	
-	public FilterForm(String startDate, String endDate, long place) {
+	public FilterForm(Date startDate, Date endDate, long place) {
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.location = place;
+		this.area = place;
 	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(String endDate) {
+	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
 
-	public long getLocation() {
-		return location;
+	public long getArea() {
+		return area;
 	}
 
-	public void setLocation(long place) {
-		this.location = place;
+	public void setArea(long place) {
+		this.area = place;
 	}
 }
