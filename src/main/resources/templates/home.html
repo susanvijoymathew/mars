@@ -9,61 +9,91 @@
 <body>
     <h2 class="mcdHeader">McDonalds Activity Reporting System</h2>
     
-    <div class="smallgap" th:unless="${#lists.isEmpty(restaurantPromotionList)}">
+    <form method="POST" th:action="@{/mars/create}" th:object="${promotionForm}" >
+    	<fieldset>
+    		<legend>Create a new promotion</legend>
+    		<div class="errorblock" th:if="${#fields.hasErrors('*')}">
+    			<p th:each="err : ${#fields.errors('*')}" th:text="${err}" />
+    		</div>
+
+        <table>
+        	<tr><td style="width:30%"/><td style="width:70%"/></tr>
+        	<tr>
+        		<td><label for="create_name">Promotion Name:</label></td>
+        		<td><input size="25" maxlength="50" type="text" th:field="*{name}" /></td>
+        	</tr>
+        	<tr>
+        		<td><label for="create_description">Description:</label></td>
+        		<td><input size="50" maxlength="100" type="text" th:field="*{description}" /></td>
+        	</tr>
+        	<tr>
+        		<td><label for="create_startDate">Start Date:</label></td>
+        		<td><input maxlength="10" type="text" th:field="*{startDate}" placeholder="MM-dd-YYYY"/></td>
+        	</tr>
+        	<tr>
+        		<td><label for="create_endDate">End Date:</label></td>
+        		<td><input maxlength="10" type="text" th:field="*{endDate}" placeholder="MM-dd-YYYY"/></td>
+        	</tr>
+        	<tr>
+        		<td><label for="create_area">Area:</label></td>
+        		<td><select th:field="*{area}" >
+        			<option th:value="-1" >-- Area to be selected --</option>
+        			<option th:each="loc : ${locations}" th:value="${loc.id}"
+        				th:text="((${loc.level} == 4) ? '&nbsp;&nbsp;&nbsp;&nbsp;' + ${loc.name} : ${loc.name})" >
+        			</option>
+        		</select></td>
+        	</tr>
+        	<tr>
+        		<td><label for="create_product">Product:</label></td>
+        		<td><select th:field="*{product}">
+        		<option th:each="prdct : ${products}" th:value="${prdct.id}" th:text="${prdct.name}" ></option>
+        		</select></td>
+        	</tr>
+        	<tr>
+        		<td>&nbsp;</td>
+        		<td><input class="submitButton" type="submit" value="Save Promotion" /></td>
+        	</tr>
+        </table>
+	    </fieldset>
+    </form>
+    
+    <div class="mediumgap">
 	    <form method="POST" th:action="@{/mars/filter}" th:object="${filterForm}" >
-	        <label for="startDate">Start Date: </label><input type="text" name="startDate" />&nbsp;
-	        <label for="endDate">End Date: </label><input type="text" name="endDate" />&nbsp;
-	        <label for="location">Area: </label>&nbsp;
-	        <select th:field="*{location}">
-	            <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name}" ></option>
+    		<div class="errorblock" th:if="${#fields.hasErrors('*')}">
+    			<p th:each="err : ${#fields.errors('*')}" th:text="${err}" />
+    		</div>
+    		
+	        <label for="filter_startDate">Start Date: </label><input maxlength="10" type="text" th:field="*{startDate}" placeholder="MM-dd-YYYY"/>&nbsp;
+	        <label for="filter_endDate">End Date: </label><input maxlength="10" type="text" th:field="*{endDate}" placeholder="MM-dd-YYYY"/>&nbsp;
+	        <label for="filter_area">Area: </label>&nbsp;
+	        <select th:field="*{area}">
+	            <option th:value="-1" >-- Area to be selected --</option>
+	            <option th:each="loc : ${locations}" th:value="${loc.id}"
+        			th:text="((${loc.level} == 4) ? '&nbsp;&nbsp;&nbsp;&nbsp;' + ${loc.name} : ${loc.name})" >
+        		</option>
 	        </select>
-	        <input type="submit" value="Apply Filter" />
+	        <input class="submitButton" type="submit" value="Apply Filter" />
 	    </form>
-	    
-	    <table id="PromoTable" style="width:95%" >
+
+	    <table id="PromoTable" style="width:100%">
 	      <thead>
 	        <tr>
-	          <th>Promotion</th>
-	          <th>Start Date</th>
-	          <th>End Date</th>
-	          <th>Area</th>
-	          <th>Product</th>
+	          <th style="width:45%">Promotion</th>
+	          <th style="width:10%">Start Date</th>
+	          <th style="width:10%">End Date</th>
+	          <th style="width:25%">Area</th>
 	        </tr>
 	      </thead>
-	      <tbody>
+	      <tbody th:unless="${#lists.isEmpty(restaurantPromotionList)}">
 	        <tr th:each="restPromo : ${restaurantPromotionList}">
-	          <td th:text="${restPromo.promotion.name}">promotion name</td>
-	          <td th:text="${#dates.format(restPromo.promotion.startDate, 'MM-dd-yyyy')}"></td>
-	          <td th:text="${#dates.format(restPromo.promotion.endDate, 'MM-dd-yyyy')}"></td>
-	          <td th:text="${restPromo.area.name}">city</td>
-	          <td th:text="${restPromo.product.name}">product</td>
+	          <td th:text="${restPromo.promotion.name}" />
+	          <td th:text="${#dates.format(restPromo.promotion.startDate, 'MM-dd-yyyy')}" />
+	          <td th:text="${#dates.format(restPromo.promotion.endDate, 'MM-dd-yyyy')}" />
+	          <td th:text="${restPromo.area.name}" />
 	        </tr>
 	      </tbody>
 	    </table>
     </div>
-    
-    <div class="smallgap">
-    <form method="POST" th:action="@{/mars/create}" th:object="${promotionForm}" >
-        <ul th:if="${#fields.hasErrors('*')}">
-            <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
-        </ul>
 
-	    <label for="name">Promotion Name: </label><input type="text" th:field="*{name}" /><br />
-	    <label for="description">Promotion Description: </label><input type="text" th:field="*{description}" /><br />
-	    <label for="startDate">Start Date (MM-DD-YYYY): </label><input type="text" th:field="*{startDate}" /><br />
-	    <label for="endDate">End Date (MM-DD-YYYY): </label><input type="text" th:field="*{endDate}" /><br />
-	    <label for="area">Area: </label>
-	    <select th:field="*{area}">
-	        <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name}" ></option>
-	    </select>
-	    <br />
-	    <label for="product">Product: </label>
-	    <select th:field="*{product}">
-	        <option th:each="prdct : ${products}" th:value="${prdct.id}" th:text="${prdct.name}" ></option>
-	    </select>
-	    <br />
-	    <input type="submit" value="Save" />
-    </form>
-    </div>
 </body>
 </html>
