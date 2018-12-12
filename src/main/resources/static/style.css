@@ -5,6 +5,43 @@ body {
 	margin: 20px;
 }
 
+table, th, td {
+    border: #1px solid black;
+    border-collapse: collapse;
+}
+
+table#PromoTable th{
+	width: 100%;
+	text-align: left;
+	background-color: #8A0808;
+	color: #FFBF00;
+}
+
+table#PromoTable tr:nth-child(even) {
+    background-color: #A4A4A4;
+}
+
+table#PromoTable tr:nth-child(odd) {
+   background-color: #FFFFFF;
+}
+
+label {
+#	display: inline-block;
+	text-align: right;
+}
+
+.error {
+	color: #FF0000;
+}
+
+.errorblock {
+	color: #000000;
+	background-color: #FFEEEE;
+	border: 3px solid #FF0000;
+	padding: 8px;
+	margin: 16px;
+}
+
 .mcdHeader {
 	display: block;
 	padding: 50px;
@@ -14,30 +51,24 @@ body {
 	font-size: 30px;
 }
 
+.mediumgap {
+	margin: 50px 0px 50px 0px;
+}
+
 .smallgap {
-	margin: 25px 0px 25px 0px;
+	margin: 10px 0px 10px 0px;
 }
 
-table, th, td {
-    border: #1px solid black;
-    border-collapse: collapse;
+.submitButton {
+	border-radius: 8px;
+	-webkit-transition-duration: 0.4s;
+	transition-duration: 0.4s;
+	background-color: white;
+	color: black;
+	border: 2px solid #8A0808;
 }
 
-table#PromoTable th{
+.submitButton:hover {
 	background-color: #8A0808;
-	color: #FFBF00; 
-}
-
-table#PromoTable tr:nth-child(even) {
-    background-color: #A4A4A4; // #A4A4A4
-}
-
-table#PromoTable tr:nth-child(odd) {
-   background-color: #FFFFFF;
-}
-
-
-label {
-	display: inline-block;
-	text-align: right;
+	color: #FFBF00;
 }
