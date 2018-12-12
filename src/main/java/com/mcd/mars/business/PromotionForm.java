@@ -1,9 +1,12 @@
 package com.mcd.mars.business;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 public class PromotionForm {
 	@Positive(message="Please select an area for this promotion.")
@@ -11,30 +14,26 @@ public class PromotionForm {
 	@Positive(message="Please select a product for this promotion.")
 	private long product;
 	
-	@NotNull(message="Please enter a date in MM-dd-YYYY format.")
-	private String startDate;
+	@NotNull(message="Please enter promotion start date in MM-dd-YYYY format.")
+	@DateTimeFormat(pattern="MM-dd-yyyy")
+	private Date startDate;
 	
-	@NotNull(message="Please enter a date in MM-dd-YYYY format.")
-	private String endDate;
+	@NotNull(message="Please enter promotion end date in MM-dd-YYYY format.")
+	@DateTimeFormat(pattern="MM-dd-yyyy")
+	private Date endDate;
 	
 	@NotBlank(message="Promotion name cannot be empty.")
 	private String name;
 	
 	@NotBlank(message="Promotion description cannot be empty.")
-	@Size(min = 4, max = 100)
 	private String description;
 	
 	public PromotionForm() {
-		this.name = null;
-		this.description = null;
-		this.startDate = null;
-		this.endDate = null;
-		this.area = -1;
-		this.product = -1;
+		this(null, null, null, null, -1, -1);
 	}
 	
-	public PromotionForm(String name, String description, String startDate, String endDate, long areaId, long productId) {
-		this.name = name;
+	public PromotionForm(String name, String description, Date startDate, Date endDate, long areaId, long productId) {
+	this.name = name;
 		this.description = description;
 		this.startDate = startDate;
 		this.endDate = endDate;
@@ -57,25 +56,25 @@ public class PromotionForm {
 	public void setProduct(long product) {
 		this.product = product;
 	}
+	
+	public String getName() {
+		return name;
+	}
 
-	public String getStartDate() {
+	public Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public String getEndDate() {
+	public Date getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(String endDate) {
+	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public void setName(String name) {
