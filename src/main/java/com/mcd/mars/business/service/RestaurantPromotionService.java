@@ -2,9 +2,7 @@ package com.mcd.mars.business.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +19,7 @@ import com.mcd.mars.data.repository.ProductRepository;
 import com.mcd.mars.data.repository.PromotionRepository;
 import com.mcd.mars.data.repository.RoleRepository;
 import com.mcd.mars.data.repository.UserRepository;
+import com.mcd.mars.utility.AreaUtil;
 
 @Service
 public class RestaurantPromotionService {
@@ -42,23 +41,19 @@ public class RestaurantPromotionService {
 		this.productRepository = products;
 		this.promotionRepository = promotions;
 		this.userRepository = users;
-		
-		//createAreaMap(this.getAllAreas());
 	}
 	
 	// When cache is updated or invalidated, ensure map in AreaUtil is updated
-	@Cacheable("areas")
+	@Cacheable("mars_areas")
 	public List<Area> getAllAreas() {
 		return areaRepository.findAll();
 	}
 	
-	public List<Area> getAllAreasFor(Area location) {
-		List<Area> results = new ArrayList<Area>();
-		List<Area> allAreas = this.getAllAreas();
-//TODO: cull for specific area
-		return results;
+	public List<Area> getAreasOf(String name, String type, boolean includeSearchArea) {
+		return AreaUtil.getAreasOf(name, type, includeSearchArea, this.getAllAreas()); 
 	}
 	
+	@Cacheable("mars_products")
 	public List<Product> getAllProducts() {
 		return productRepository.findAll();
 	}
@@ -78,7 +73,7 @@ public class RestaurantPromotionService {
 		promotionRepository.save(p);
 	}
 	
-	public List<RestaurantPromotion> getAllActivePromotions() {
+	public List<RestaurantPromotion> getActivePromotions() {
 		List<RestaurantPromotion> usPromos = new ArrayList<RestaurantPromotion> ();
 		List<Promotion> promotions = promotionRepository.findAllActivePromotions();
 		
@@ -99,9 +94,8 @@ public class RestaurantPromotionService {
 	
 	public List<RestaurantPromotion> getAllPromotions() {
 		List<RestaurantPromotion> usPromos = new ArrayList<RestaurantPromotion> ();
-		List<Promotion> promotions = promotionRepository.findAll();
 		
-		for (Promotion promo: promotions) {
+		for (Promotion promo: promotionRepository.findAll()) {
 			RestaurantPromotion rp = new RestaurantPromotion();
 			
 			rp.setPromotion(promo);
@@ -118,9 +112,18 @@ public class RestaurantPromotionService {
 	
 	public List<RestaurantPromotion> getPromotionsByFilterSelections(Date startDate, Date endDate, long areaId) {
 		List<RestaurantPromotion> usPromos = new ArrayList<RestaurantPromotion> ();
-		/*List<Area> areas = AreaCache.getInstance().getAllAreas();
-		for (Area a: areas)
-		System.out.println(a);*/
+		
+		// If area is not selected, then all promotions that match the date filter should be shown.
+		// Else, we have to include promotions that belong to the areas under the selected area.
+		List<Area> searchAreas =
+			(areaId <= 0) ?
+				null :
+				AreaUtil.getAreasOf(areaId, true, this.getAllAreas());
+		
+		// This should not happen but just in case.
+		if (areaId > 0 && searchAreas == null)
+			return usPromos; // return empty list
+		
 		
 		List<Promotion> promotions = null;
 		if (startDate != null && endDate != null) {
@@ -130,17 +133,13 @@ public class RestaurantPromotionService {
 		} else if (endDate != null) {
 			promotions = promotionRepository.findByEndDateLessThanEqual(endDate);
 		} else {
-			promotions = promotionRepository.findAllActivePromotions();
+			promotions = promotionRepository.findAll();
 		}
 		
 		for (Promotion promo: promotions) {
 			Area area = areaRepository.findById(promo.getAreaId());
-			
-			//If area selected is a state, then all cities of this state that come up in the promotion list
-			//should be chosen for display.
-			
-			//if (areaName != null && (areaName.equals(area.getName()) || aCache) )
-			//	continue;
+			if (areaId > 0 && !searchAreas.contains(area))
+				continue;
 			
 			RestaurantPromotion rp = new RestaurantPromotion();
 			
