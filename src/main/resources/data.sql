@@ -471,6 +471,13 @@ INSERT INTO Product(Name, Category) VALUES('Oreo Milk Shake', 'Dessert');
 
 
 INSERT INTO Promotion(Name, Description, Area_Id, Product_Id, Start_Date, End_Date, Modified_Date, Modified_User_Id)
+    VALUES('69 cents cheeseburger', 'Cheeseburger for $0.69 for a limited time.',
+        (SELECT Id FROM Area WHERE Name = 'Boise'),
+        (SELECT Id FROM Product WHERE Name = 'Hamburger'), --'2018-10-01', '2018-10-21',
+        DATEADD('DAY', -20, CURRENT_DATE), DATEADD('DAY', -5, CURRENT_DATE), DATEADD('DAY', -30, CURRENT_DATE),
+        (SELECT Id from User_Details where Email_Address = 'susan.vijoy.mathew@gmail.com')
+    );
+INSERT INTO Promotion(Name, Description, Area_Id, Product_Id, Start_Date, End_Date, Modified_Date, Modified_User_Id)
     VALUES('59 cents hamburger', 'Hamburger for $0.59 for a limited time.',
         (SELECT Id FROM Area WHERE Name = 'Schaumburg'),
         (SELECT Id FROM Product WHERE Name = 'Hamburger'), --'2018-10-01', '2018-10-21',
@@ -488,27 +495,34 @@ INSERT INTO Promotion(Name, Description, Area_Id, Product_Id, Start_Date, End_Da
     VALUES('$1 Sandwich', 'Get a Sandwich for $1. Only available through our mobile app',
         (SELECT Id FROM Area WHERE Name = 'Palatine'),
         (SELECT Id FROM Product WHERE Name = 'Hamburger'),
-        DATEADD('DAY', -7, CURRENT_DATE), DATEADD('DAY', +21, CURRENT_DATE), DATEADD('DAY', -90, CURRENT_DATE),
+        DATEADD('DAY', -7, CURRENT_DATE), CURRENT_DATE, DATEADD('DAY', -90, CURRENT_DATE),
         (SELECT Id from User_Details where Email_Address = 'susan.vijoy.mathew@gmail.com')
     );
 INSERT INTO Promotion(Name, Description, Area_Id, Product_Id, Start_Date, End_Date, Modified_Date, Modified_User_Id)
     VALUES('Buy McCafe, Get 1 for $0.01', 'Buy a medium or large McCafe, get 1 for $0.01. Only through our mobile app',
         (SELECT Id FROM Area WHERE Name = 'Palatine'),
         (SELECT Id FROM Product WHERE Name = 'Coffee'),
-        DATEADD('DAY', -7, CURRENT_DATE), DATEADD('DAY', +21, CURRENT_DATE), DATEADD('DAY', -14, CURRENT_DATE),
+        CURRENT_DATE, DATEADD('DAY', +21, CURRENT_DATE), DATEADD('DAY', -14, CURRENT_DATE),
         (SELECT Id from User_Details where Email_Address = 'susan.vijoy.mathew@gmail.com')
     );
 INSERT INTO Promotion(Name, Description, Area_Id, Product_Id, Start_Date, End_Date, Modified_Date, Modified_User_Id)
     VALUES('2 for $5 Mix and Match', '2 for $5. Select from Big Mac, Filet-O-Fish, Classic Chicken Sandwich, 10 pc. Chicken McNuggets',
         (SELECT Id FROM Area WHERE Name = 'Chicago'),
         (SELECT Id FROM Product WHERE Name = 'Hamburger'),
-        DATEADD('DAY', -7, CURRENT_DATE), DATEADD('DAY', +7, CURRENT_DATE), DATEADD('DAY', -14, CURRENT_DATE),
+        DATEADD('DAY', -1, CURRENT_DATE), CURRENT_DATE, DATEADD('DAY', -14, CURRENT_DATE),
         (SELECT Id from User_Details where Email_Address = 'susan.vijoy.mathew@gmail.com')
     );
 INSERT INTO Promotion(Name, Description, Area_Id, Product_Id, Start_Date, End_Date, Modified_Date, Modified_User_Id)
     VALUES('$4.99 20 pc Chicken McNuggets', '20 pc Chicken McNuggets for $4.99',
         (SELECT Id FROM Area WHERE Name = 'Chicago'),
         (SELECT Id FROM Product WHERE Name = 'Chicken Sandwich'),
-        DATEADD('DAY', -7, CURRENT_DATE), DATEADD('DAY', +14, CURRENT_DATE), DATEADD('DAY', -21, CURRENT_DATE),
+       CURRENT_DATE, DATEADD('DAY', +1, CURRENT_DATE), DATEADD('DAY', -21, CURRENT_DATE),
+        (SELECT Id from User_Details where Email_Address = 'susan.vijoy.mathew@gmail.com')
+    );
+INSERT INTO Promotion(Name, Description, Area_Id, Product_Id, Start_Date, End_Date, Modified_Date, Modified_User_Id)
+    VALUES('$1 Drinks', 'Any size drink for $1',
+        (SELECT Id FROM Area WHERE Name = 'Boise'),
+        (SELECT Id FROM Product WHERE Name = 'Coke'),
+        DATEADD('DAY', +5, CURRENT_DATE), DATEADD('DAY', +20, CURRENT_DATE), DATEADD('DAY', -30, CURRENT_DATE),
         (SELECT Id from User_Details where Email_Address = 'susan.vijoy.mathew@gmail.com')
     );
