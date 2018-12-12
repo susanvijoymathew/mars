@@ -1,6 +1,5 @@
 package com.mcd.mars.controller;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -10,19 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mcd.mars.business.FilterForm;
 import com.mcd.mars.business.PromotionForm;
 import com.mcd.mars.business.RestaurantPromotion;
 import com.mcd.mars.business.service.RestaurantPromotionService;
-import com.mcd.mars.utility.MarsDataUtility;
+import com.mcd.mars.utility.MarsConstants;
 
 @Controller
 @RequestMapping("/mars")
-public class RestaurantPromotionController {
+public class RestaurantPromotionController {	
 	private RestaurantPromotionService promotionService;
 	
 	@Autowired
@@ -32,85 +31,102 @@ public class RestaurantPromotionController {
 	
 	@RequestMapping(method=RequestMethod.GET)
     public String home(Model model) {
-		if (!model.containsAttribute("filterForm")) {
-			model.addAttribute("filterForm", new FilterForm());
-			model.addAttribute("locations", promotionService.getAllAreas());
+		this.promotionService.getAllAreas(); // Ensures AreaUtil is ready for use later.
+		
+		if (!model.containsAttribute("products"))
+			model.addAttribute("products", promotionService.getAllProducts());
+		
+		if (!model.containsAttribute("locations")) {
+			model.addAttribute(
+				"locations",
+				promotionService.getAreasOf(MarsConstants.USA, MarsConstants.COUNTRY, false));
+			// Form doesn't need to show USA in the drop down menu.
 		}
 		
-		if (!model.containsAttribute("promotionForm")) {
+		if (!model.containsAttribute("filterForm"))
+			model.addAttribute("filterForm", new FilterForm());
+		
+		if (!model.containsAttribute("promotionForm"))
 			model.addAttribute("promotionForm", new PromotionForm());
-			model.addAttribute("products", promotionService.getAllProducts());
-		}
 		
 		if (!model.containsAttribute("restaurantPromotionList"))
-			model.addAttribute( promotionService.getAllPromotions() );
+			model.addAttribute("restaurantPromotionList", promotionService.getActivePromotions());
 		
 		return "home";
 	}
 	
 	@RequestMapping(value="/filter", method=RequestMethod.POST)
-	public String filter(@Valid FilterForm filterForm, BindingResult result, RedirectAttributes model) {
-		Date sDate = null;
-		try {
-			sDate = MarsDataUtility.getAsDate(filterForm.getStartDate());
-		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 01-20-2018).");
+	public String filter(@Valid FilterForm filterForm, BindingResult result, Model model) {
+		if (result.hasErrors()) {
+			if (!model.containsAttribute("locations")) {
+				model.addAttribute(
+					"locations",
+					promotionService.getAreasOf(MarsConstants.USA, MarsConstants.COUNTRY, false));
+				// Form doesn't need to show USA in the drop down menu.
 		}
-
-		Date eDate = null;
-		try {
-			eDate = MarsDataUtility.getAsDate(filterForm.getEndDate());
-		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 12-03-2018).");
+			
+			return "home";
 		}
 		
-		if (eDate.before(sDate)) {
-			result.rejectValue("endDate", "Promotion end date must come after the promotion start date.");
+		Date sDate = filterForm.getStartDate();
+		Date eDate = filterForm.getEndDate();
+		if (sDate != null && eDate != null && eDate.before(sDate))
+		{
+			result.addError(new ObjectError("startDate", "Promotion start date must be before the end date."));
 		}
 		
 		if (result.hasErrors()) {
-			model.addAttribute("FilterForm", filterForm);
+			if (!model.containsAttribute("locations"))
+				model.addAttribute("locations", promotionService.getAreasOf(MarsConstants.USA, MarsConstants.COUNTRY, false));
+			
 			return "home";
 		}
 		
 		List<RestaurantPromotion> promotions = 
-			promotionService.getPromotionsByFilterSelections(sDate, eDate, filterForm.getLocation());
-		
+			promotionService.getPromotionsByFilterSelections(sDate, eDate, filterForm.getArea());
+
+		model.addAttribute("restaurantPromotionList", promotions);
 		model.addAttribute("filterForm", filterForm);
-		model.addAttribute(promotions);
+		model.addAttribute("promotionForm", new PromotionForm());
+		model.addAttribute("locations", promotionService.getAreasOf(MarsConstants.USA, MarsConstants.COUNTRY, false));
+		model.addAttribute("products", promotionService.getAllProducts());
 		
-		return "redirect:/mars";
+		return "home";
 	}
 	
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public String create(@Valid PromotionForm promoForm, BindingResult result, Model model) {
-		Date sDate = null;
-		try {
-			sDate = MarsDataUtility.getAsDate(promoForm.getStartDate());
-		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 01-20-2018).");
-		}
-
-		Date eDate = null;
-		try {
-			eDate = MarsDataUtility.getAsDate(promoForm.getEndDate());
-		} catch(ParseException pe) {
-			result.rejectValue("endDate", "Invalid date. Please enter in MM-DD-YYYY format (example, 12-03-2018).");
+	public String create(@Valid PromotionForm promoForm, BindingResult result, Model model)
+	{
+		if (result.hasErrors()) {
+			if (!model.containsAttribute("products"))
+				model.addAttribute("products", promotionService.getAllProducts());
+			
+			if (!model.containsAttribute("locations"))
+				model.addAttribute("locations", promotionService.getAreasOf(MarsConstants.USA, MarsConstants.COUNTRY, false));
+			
+			return "home";
 		}
 		
+		// Validation won't allow both dates to be null.
+		Date sDate = promoForm.getStartDate();
+		Date eDate = promoForm.getEndDate();
 		if (eDate.before(sDate)) {
-			result.rejectValue("endDate", "Promotion end date must come after the promotion start date.");;
+			result.addError(new ObjectError("startDate", "Promotion start date must be before the end date."));
 		}
 		
 		if (result.hasErrors()) {
-			model.addAttribute("PromotionForm", promoForm);
+			if (!model.containsAttribute("products"))
+				model.addAttribute("products", promotionService.getAllProducts());
+			
+			if (!model.containsAttribute("locations"))
+				model.addAttribute("locations", promotionService.getAreasOf(MarsConstants.USA, MarsConstants.COUNTRY, false));
+			
 			return "home";
 		}
 		
 		promotionService.addPromotion(
 			promoForm.getName(), promoForm.getDescription(),
-			sDate, eDate,
-			promoForm.getArea(), promoForm.getProduct());
+			sDate, eDate, promoForm.getArea(), promoForm.getProduct());
 		return "redirect:/mars";
 	}
 }
