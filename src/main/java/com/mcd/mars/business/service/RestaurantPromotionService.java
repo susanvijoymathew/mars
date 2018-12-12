@@ -2,9 +2,7 @@ package com.mcd.mars.business.service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +19,7 @@ import com.mcd.mars.data.repository.ProductRepository;
 import com.mcd.mars.data.repository.PromotionRepository;
 import com.mcd.mars.data.repository.RoleRepository;
 import com.mcd.mars.data.repository.UserRepository;
+import com.mcd.mars.utility.AreaUtil;
 
 @Service
 public class RestaurantPromotionService {
@@ -30,10 +29,6 @@ public class RestaurantPromotionService {
 	private ProductRepository productRepository;
 	private PromotionRepository promotionRepository;
 	private UserRepository userRepository;
-
-	private final String ROOT = "Root";
-	private final String CITY = "City"; // should be an enumeration
-	private Map<Area, ArrayList<Area>> areaMap;
 	
 	@Autowired
 	public RestaurantPromotionService(
@@ -46,69 +41,45 @@ public class RestaurantPromotionService {
 		this.productRepository = products;
 		this.promotionRepository = promotions;
 		this.userRepository = users;
-		
-		createAreaMap(this.getAllAreas());
 	}
 	
 	// When cache is updated or invalidated, ensure map in AreaUtil is updated
-	@Cacheable("areas")
+	@Cacheable("mars_areas")
 	public List<Area> getAllAreas() {
 		return areaRepository.findAll();
-		/*
-		    System.out.println("Printing the areas retrieved from Database");
-			String space = "    ";
-			for (com.mcd.mars.data.entity.Area a: susanAreas) {
-				String spaces = (new String(new char[a.getLevel()]).replace("\0", space));
-				System.out.println(spaces + a);
-			}
-		 */
 	}
 	
-	public List<Area> getAllAreasFor(Area location) {
-		List<Area> results = new ArrayList<Area>();
-		List<Area> allAreas = this.getAllAreas();
-
-		return results;
+	public List<Area> getAreasOf(String name, String type, boolean includeSearchArea) {
+		return AreaUtil.getAreasOf(name, type, includeSearchArea, this.getAllAreas()); 
 	}
 	
-	private void createAreaMap(List<Area> locations) {
-		this.areaMap = new HashMap<Area, ArrayList<Area>>();
-		
-		for (Area a : locations) {
-			// City doesn't have children. If it every does, the following line should be updated.
-			if (!areaMap.containsKey(a) && !a.getType().equals(CITY))
-				areaMap.put(a, new ArrayList<Area>());
-			
-			if (!a.getType().equals(ROOT)) {
-				Area parent = a.getParent();
-				
-				ArrayList<Area> children = areaMap.containsKey(parent) ? areaMap.get(parent) : new ArrayList<Area>();
-				children.add(a);
-				areaMap.put(parent, children);
-			}
-		}
-		
-		for (Area a : areaMap.keySet()) {
-			System.out.println(a);
-			ArrayList<Area> children = areaMap.get(a);
-			for (Area c : children) {
-				System.out.println("\t" + c);
-			}
-			System.out.println("\t\t***********************************************************");
-		}
-	}
-	
+	@Cacheable("mars_products")
 	public List<Product> getAllProducts() {
 		return productRepository.findAll();
 	}
 	
-	public List<RestaurantPromotion> getAllActivePromotions() {
+	public void addPromotion(String name, String description, Date startDate, Date endDate, long area, long product) {
+		Promotion p = new Promotion();
+		
+		p.setAreaId(area);
+		p.setProductId(product);
+		p.setName(name);
+		p.setDescription(description);
+		p.setStartDate(startDate);
+		p.setEndDate(endDate);
+		p.setModifiedDate(new Date());
+		p.setModifiedUserId(1); // hard coded for now
+		
+		promotionRepository.save(p);
+	}
+	
+	public List<RestaurantPromotion> getActivePromotions() {
 		List<RestaurantPromotion> usPromos = new ArrayList<RestaurantPromotion> ();
 		List<Promotion> promotions = promotionRepository.findAllActivePromotions();
 		
 		for (Promotion promo: promotions) {
 			RestaurantPromotion rp = new RestaurantPromotion();
-			
+			//TODO: determine if this promotion is active.
 			rp.setPromotion(promo);
 			rp.setArea( areaRepository.findById(promo.getAreaId()) );
 			rp.setProduct( productRepository.findById(promo.getProductId()) );
@@ -123,9 +94,8 @@ public class RestaurantPromotionService {
 	
 	public List<RestaurantPromotion> getAllPromotions() {
 		List<RestaurantPromotion> usPromos = new ArrayList<RestaurantPromotion> ();
-		List<Promotion> promotions = promotionRepository.findAll();
 		
-		for (Promotion promo: promotions) {
+		for (Promotion promo: promotionRepository.findAll()) {
 			RestaurantPromotion rp = new RestaurantPromotion();
 			
 			rp.setPromotion(promo);
@@ -142,9 +112,18 @@ public class RestaurantPromotionService {
 	
 	public List<RestaurantPromotion> getPromotionsByFilterSelections(Date startDate, Date endDate, long areaId) {
 		List<RestaurantPromotion> usPromos = new ArrayList<RestaurantPromotion> ();
-		/*List<Area> areas = AreaCache.getInstance().getAllAreas();
-		for (Area a: areas)
-		System.out.println(a);*/
+		
+		// If area is not selected, then all promotions that match the date filter should be shown.
+		// Else, we have to include promotions that belong to the areas under the selected area.
+		List<Area> searchAreas =
+			(areaId <= 0) ?
+				null :
+				AreaUtil.getAreasOf(areaId, true, this.getAllAreas());
+		
+		// This should not happen but just in case.
+		if (areaId > 0 && searchAreas == null)
+			return usPromos; // return empty list
+		
 		
 		List<Promotion> promotions = null;
 		if (startDate != null && endDate != null) {
@@ -154,17 +133,13 @@ public class RestaurantPromotionService {
 		} else if (endDate != null) {
 			promotions = promotionRepository.findByEndDateLessThanEqual(endDate);
 		} else {
-			promotions = promotionRepository.findAllActivePromotions();
+			promotions = promotionRepository.findAll();
 		}
 		
 		for (Promotion promo: promotions) {
 			Area area = areaRepository.findById(promo.getAreaId());
-			
-			//If area selected is a state, then all cities of this state that come up in the promotion list
-			//should be chosen for display.
-			
-			//if (areaName != null && (areaName.equals(area.getName()) || aCache) )
-			//	continue;
+			if (areaId > 0 && !searchAreas.contains(area))
+				continue;
 			
 			RestaurantPromotion rp = new RestaurantPromotion();
 			
