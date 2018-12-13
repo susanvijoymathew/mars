@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>McDonalds Activity Reporting System</title>
+    <link rel="stylesheet" th:href="@{/style.css}" />
+</head>
+
+<body>
+    <h2 class="mcdHeader">McDonalds Activity Reporting System</h2>
+    
+    <form method="POST" th:action="@{/mars/update}" th:object="${promotionForm}" >
+    	<fieldset>
+    		<legend>Update the existing promotion</legend>
+    		<div class="errorblock" th:if="${#fields.hasErrors('*')}">
+    			<p th:each="err : ${#fields.errors('*')}" th:text="${err}" />
+    		</div>
+
+        <table>
+        	<tr><td style="width:30%"/><td style="width:70%"/></tr>
+        	<tr><td colspan="2"><input style="display:none;" type="text" th:field="*{id}" /></td></tr>
+        	<tr>
+        		<td><label for="update_name">Promotion Name:</label></td>
+        		<td><input size="25" maxlength="50" type="text" th:field="*{name}" /></td>
+        	</tr>
+        	<tr>
+        		<td><label for="update_description">Description:</label></td>
+        		<td><input size="50" maxlength="100" type="text" th:field="*{description}" /></td>
+        	</tr>
+        	<tr>
+        		<td><label for="update_startDate">Start Date:</label></td>
+        		<td><input maxlength="10" type="text" th:field="*{startDate}" placeholder="MM-dd-YYYY"/></td>
+        	</tr>
+        	<tr>
+        		<td><label for="update_endDate">End Date:</label></td>
+        		<td><input maxlength="10" type="text" th:field="*{endDate}" placeholder="MM-dd-YYYY"/></td>
+        	</tr>
+        	<tr>
+        		<td><label for="update_area">Area:</label></td>
+        		<td><select th:field="*{area}" >
+        			<option th:value="-1" >-- Area to be selected --</option>
+        			<option th:each="loc : ${locations}" th:value="${loc.id}"
+        				th:text="((${loc.level} == 4) ? '&nbsp;&nbsp;&nbsp;&nbsp;' + ${loc.name} : ${loc.name})" >
+        			</option>
+        		</select></td>
+        	</tr>
+        	<tr>
+        		<td><label for="update_product">Product:</label></td>
+        		<td><select th:field="*{product}">
+        		<option th:each="prdct : ${products}" th:value="${prdct.id}" th:text="${prdct.name}" ></option>
+        		</select></td>
+        	</tr>
+        	<tr>
+        		<td>&nbsp;</td>
+        		<td><input class="submitButton" type="submit" value="Update Promotion" /></td>
+        	</tr>
+        </table>
+	    </fieldset>
+    </form>
+
+</body>
+</html>
