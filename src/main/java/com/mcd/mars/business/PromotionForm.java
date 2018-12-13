@@ -9,6 +9,8 @@ import javax.validation.constraints.Positive;
 import org.springframework.format.annotation.DateTimeFormat;
 
 public class PromotionForm {
+	// Meant to be a hidden field in forms, if needed.
+	private long id;
 	@Positive(message="Please select an area for this promotion.")
 	private long area;
 	@Positive(message="Please select a product for this promotion.")
@@ -29,17 +31,21 @@ public class PromotionForm {
 	private String description;
 	
 	public PromotionForm() {
-		this(null, null, null, null, -1, -1);
+		this(-1, null, null, null, null, -1, -1);
 	}
 	
-	public PromotionForm(String name, String description, Date startDate, Date endDate, long areaId, long productId) {
-	this.name = name;
+	public PromotionForm(long id, String name, String description, Date startDate, Date endDate, long areaId, long productId) {
+		this.id = id;
+		this.name = name;
 		this.description = description;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.area = areaId;
 		this.product = productId;
 	}
+	
+	public long getId() { return id; }
+	public void setId(long id) { this.id = id; }
 
 	public long getArea() {
 		return area;
