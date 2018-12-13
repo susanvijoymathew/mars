@@ -86,7 +86,7 @@
 	      </thead>
 	      <tbody th:unless="${#lists.isEmpty(restaurantPromotionList)}">
 	        <tr th:each="restPromo : ${restaurantPromotionList}">
-	          <td th:text="${restPromo.promotion.name}" />
+	          <td><a href="edit.html" th:href="@{'/mars/edit/' + ${restPromo.promotion.id}}" th:text="${restPromo.promotion.name}"></a></td>
 	          <td th:text="${#dates.format(restPromo.promotion.startDate, 'MM-dd-yyyy')}" />
 	          <td th:text="${#dates.format(restPromo.promotion.endDate, 'MM-dd-yyyy')}" />
 	          <td th:text="${restPromo.area.name}" />
