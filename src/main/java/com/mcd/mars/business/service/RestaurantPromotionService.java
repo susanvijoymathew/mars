@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import com.mcd.mars.business.PromotionForm;
 import com.mcd.mars.business.RestaurantPromotion;
 import com.mcd.mars.data.entity.Area;
 import com.mcd.mars.data.entity.Product;
@@ -43,10 +44,15 @@ public class RestaurantPromotionService {
 		this.userRepository = users;
 	}
 	
-	// When cache is updated or invalidated, ensure map in AreaUtil is updated
+	// When cache is updated or invalidated, invalidate the mars_usa_areas cache.
 	@Cacheable("mars_areas")
 	public List<Area> getAllAreas() {
 		return areaRepository.findAll();
+	}
+	
+	@Cacheable("mars_usa_areas")
+	public List<Area> getAreasOfUSA(String name, String type) {
+		return AreaUtil.getAreasOf(name, type, false, this.getAllAreas());
 	}
 	
 	public List<Area> getAreasOf(String name, String type, boolean includeSearchArea) {
@@ -58,15 +64,15 @@ public class RestaurantPromotionService {
 		return productRepository.findAll();
 	}
 	
-	public void addPromotion(String name, String description, Date startDate, Date endDate, long area, long product) {
+	public void addPromotion(PromotionForm form) {
 		Promotion p = new Promotion();
 		
-		p.setAreaId(area);
-		p.setProductId(product);
-		p.setName(name);
-		p.setDescription(description);
-		p.setStartDate(startDate);
-		p.setEndDate(endDate);
+		p.setName(form.getName());
+		p.setDescription(form.getDescription());
+		p.setStartDate(form.getStartDate());
+		p.setEndDate(form.getEndDate());
+		p.setAreaId(form.getArea());
+		p.setProductId(form.getProduct());
 		p.setModifiedDate(new Date());
 		p.setModifiedUserId(1); // hard coded for now
 		
@@ -108,6 +114,23 @@ public class RestaurantPromotionService {
 		}
 		
 		return usPromos;
+	}
+	
+	/*
+	public RestaurantPromotion getPromotion(long id) {
+		Promotion p = promotionRepository.findById(id);
+		RestaurantPromotion rp = new RestaurantPromotion();
+		
+		rp.setPromotion(p);
+		rp.setArea( areaRepository.findById(p.getAreaId()) );
+		rp.setProduct( productRepository.findById(p.getProductId()) );
+		rp.setUser( userRepository.findById(p.getModifiedUserId()) );
+		rp.setRole( roleRepository.findById( rp.getUser().getRoleId()) );
+		
+		return rp;
+	}*/
+	public Promotion getPromotion(long id) {
+		return promotionRepository.findById(id);
 	}
 	
 	public List<RestaurantPromotion> getPromotionsByFilterSelections(Date startDate, Date endDate, long areaId) {
@@ -153,6 +176,21 @@ public class RestaurantPromotionService {
 		}
 		
 		return usPromos;
+	}
+	
+	public void updatePromotion(PromotionForm form) {
+		Promotion p = promotionRepository.findById(form.getId());
+		
+		p.setName(form.getName());
+		p.setDescription(form.getDescription());
+		p.setStartDate(form.getStartDate());
+		p.setEndDate(form.getEndDate());
+		p.setAreaId(form.getArea());
+		p.setProductId(form.getProduct());
+		p.setModifiedDate(new Date());
+		p.setModifiedUserId(1); // hard coded for now
+		
+		promotionRepository.save(p);
 	}
 	
 	public List<Role> getAllRoles() {
