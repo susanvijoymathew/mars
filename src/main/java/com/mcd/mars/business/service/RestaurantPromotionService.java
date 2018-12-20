@@ -1,6 +1,7 @@
 package com.mcd.mars.business.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import com.mcd.mars.data.repository.PromotionRepository;
 import com.mcd.mars.data.repository.RoleRepository;
 import com.mcd.mars.data.repository.UserRepository;
 import com.mcd.mars.utility.AreaUtil;
+import com.mcd.mars.utility.MarsConstants;
 
 @Service
 public class RestaurantPromotionService {
@@ -44,19 +46,22 @@ public class RestaurantPromotionService {
 		this.userRepository = users;
 	}
 	
-	// When cache is updated or invalidated, invalidate the mars_usa_areas cache.
+	// When cache is updated or invalidated, invalidate the mars_areas and mars_usa_areas cache.
 	@Cacheable("mars_areas")
 	public List<Area> getAllAreas() {
 		return areaRepository.findAll();
 	}
 	
+	// When cache is updated or invalidated, invalidate the mars_areas and mars_usa_areas cache.
 	@Cacheable("mars_usa_areas")
-	public List<Area> getAreasOfUSA(String name, String type) {
-		return AreaUtil.getAreasOf(name, type, false, this.getAllAreas());
+	public List<Area> getAreasOfUSA(boolean includeSearchArea) {
+		List<Area> results = getAreasOf(MarsConstants.USA, MarsConstants.COUNTRY, includeSearchArea);
+
+		return results;
 	}
 	
 	public List<Area> getAreasOf(String name, String type, boolean includeSearchArea) {
-		return AreaUtil.getAreasOf(name, type, includeSearchArea, this.getAllAreas()); 
+		return AreaUtil.getAreasOf(name, type, includeSearchArea, this.getAllAreas());
 	}
 	
 	@Cacheable("mars_products")
@@ -85,7 +90,7 @@ public class RestaurantPromotionService {
 		
 		for (Promotion promo: promotions) {
 			RestaurantPromotion rp = new RestaurantPromotion();
-			//TODO: determine if this promotion is active.
+			
 			rp.setPromotion(promo);
 			rp.setArea( areaRepository.findById(promo.getAreaId()) );
 			rp.setProduct( productRepository.findById(promo.getProductId()) );
@@ -95,7 +100,9 @@ public class RestaurantPromotionService {
 			usPromos.add(rp);
 		}
 		
+		Collections.sort(usPromos);
 		return usPromos;
+		//return sortByArea(usPromos, getAreasOfUSA(false));
 	}
 	
 	public List<RestaurantPromotion> getAllPromotions() {
@@ -113,22 +120,11 @@ public class RestaurantPromotionService {
 			usPromos.add(rp);
 		}
 		
+		Collections.sort(usPromos);
 		return usPromos;
+		//return sortByArea(usPromos, getAreasOfUSA(false));
 	}
 	
-	/*
-	public RestaurantPromotion getPromotion(long id) {
-		Promotion p = promotionRepository.findById(id);
-		RestaurantPromotion rp = new RestaurantPromotion();
-		
-		rp.setPromotion(p);
-		rp.setArea( areaRepository.findById(p.getAreaId()) );
-		rp.setProduct( productRepository.findById(p.getProductId()) );
-		rp.setUser( userRepository.findById(p.getModifiedUserId()) );
-		rp.setRole( roleRepository.findById( rp.getUser().getRoleId()) );
-		
-		return rp;
-	}*/
 	public Promotion getPromotion(long id) {
 		return promotionRepository.findById(id);
 	}
@@ -175,7 +171,9 @@ public class RestaurantPromotionService {
 			usPromos.add(rp);
 		}
 		
+		Collections.sort(usPromos);
 		return usPromos;
+		//return sortByArea(usPromos, getAreasOfUSA(false));
 	}
 	
 	public void updatePromotion(PromotionForm form) {
@@ -200,4 +198,17 @@ public class RestaurantPromotionService {
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
 	}
+	/*
+	private List<RestaurantPromotion> sortByArea(List<RestaurantPromotion> unsortedRPs, List<Area> usaAreas) {
+		List<RestaurantPromotion> sortedRPs = new ArrayList<RestaurantPromotion>();
+		
+		for (Area a : usaAreas) {
+			List<RestaurantPromotion> rps =
+				unsortedRPs.stream().filter(rp -> rp.getArea().equals(a)).collect(Collectors.toList());
+			sortedRPs.addAll(rps);
+		}
+		
+		return sortedRPs;
+	}
+	*/
 }
