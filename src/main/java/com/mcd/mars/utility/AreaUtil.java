@@ -7,7 +7,8 @@ import com.mcd.mars.data.entity.Area;
 
 public final class AreaUtil {
 	/**
-	 * Returns areas under the requested Area. The requested area is not included.
+	 * Returns areas under the requested Area. The requested area is included in the resulting list if
+	 * the boolean flag is set.
 	 * 
 	 * @param loc - Area to search under
 	 * @param includeSearchArea - specifies if Area to which areaId belongs should be included in the list.
@@ -16,22 +17,13 @@ public final class AreaUtil {
 	 */
 	public static List<Area> getAreasOf(Area loc, boolean includeSearchArea, List<Area> allAreas) {
 		ArrayList<Area> results = new ArrayList<Area>();
-		boolean found = false;
 		
 		for (Area a : allAreas) {
-			if (!found && (a.getName().equals(loc.getName()) && a.getType().equals(loc.getType())) ) {
+			if (a.getName().equals(loc.getName()) && a.getType().equals(loc.getType())) {
 				if (includeSearchArea)
 					results.add(a);
-				found = true;
-				continue;
-			}
-			if (found) {
-				// World is the root level, followed by Continent, then Country, then State or Province,
-				// lastly, City. So, if we are seeing an area with the same level as the base in this
-				// method or lower, we have all the children of the base area we were asked to find.
-				if (a.getLevel() <= loc.getLevel())
-					break;
-				results.add(a);
+				
+				getDescendants(a, results);
 			}
 		}
 		
@@ -39,7 +31,8 @@ public final class AreaUtil {
 	}
 	
 	/**
-	 * Returns areas under the requested Area by name and type. The requested area is not included.
+	 * Returns areas under the requested Area by name and type. The requested area is included in the
+	 * resulting list if the boolean flag is set.
 	 * 
 	 * @param name - name of the area interested
 	 * @param type - type of the area interested - in case, name isn't unique
@@ -49,25 +42,13 @@ public final class AreaUtil {
 	 */
 	public static List<Area> getAreasOf(String name, String type, boolean includeSearchArea, List<Area> allAreas) {
 		ArrayList<Area> results = new ArrayList<Area>();
-		int baseLevel = -1;
-		boolean found = false;
 		
 		for (Area a : allAreas) {
-			if (!found && (a.getName().equals(name) && a.getType().equals(type))) {
+			if (a.getName().equals(name) && a.getType().equals(type)) {
 				if (includeSearchArea)
 					results.add(a);
 				
-				baseLevel = a.getLevel();
-				found = true;				
-				continue;
-			}
-			if (found) {
-				// World is the root level, followed by Continent, then Country, then State or Province,
-				// lastly, City. So, if we are seeing an area with the same level as the base in this
-				// method or lower, we have all the children of the base area we were asked to find.
-				if (a.getLevel() <= baseLevel)
-					break;
-				results.add(a);
+				getDescendants(a, results);
 			}
 		}
 		
@@ -93,5 +74,16 @@ public final class AreaUtil {
 		}
 		
 		return null;
+	}
+	
+	private static void getDescendants(Area parent, List<Area> results) {
+		// Sort the children to be safe; in case a new area is added in the future.
+		List<Area> children = (List<Area>) parent.getChildren();
+		children.sort( (Area o1, Area o2) -> o1.getName().compareTo(o2.getName()) );
+		
+		for (Area a : children) {
+			results.add(a);
+			getDescendants(a, results);
+		}
 	}
 }
