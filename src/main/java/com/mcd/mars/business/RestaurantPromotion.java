@@ -9,7 +9,7 @@ import com.mcd.mars.data.entity.Role;
 import com.mcd.mars.data.entity.User;
 
 @Service
-public class RestaurantPromotion {
+public class RestaurantPromotion implements Comparable<RestaurantPromotion> {
 	private Area area;
 	private Product product;
 	private Promotion promotion;
@@ -71,5 +71,25 @@ public class RestaurantPromotion {
 	@Override
 	public String toString() {
 		return promotion + "\n" + area + "\n" + product + "\n" + user + "\n";
+	}
+
+	@Override
+	public int compareTo(RestaurantPromotion other) {
+		Promotion thisP = this.getPromotion();
+		Promotion otherP = other.getPromotion();
+			
+		int sdateCmp = thisP.getStartDate().compareTo(otherP.getStartDate());
+		
+		if (sdateCmp == 0) {
+			int edateCmp = thisP.getEndDate().compareTo(otherP.getEndDate());
+			
+			if (edateCmp == 0) {
+				return this.getArea().compareTo(other.getArea());
+			}
+			
+			return edateCmp;
+		}
+			
+		return sdateCmp;
 	}
 }
