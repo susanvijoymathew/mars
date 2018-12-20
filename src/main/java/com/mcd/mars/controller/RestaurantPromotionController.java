@@ -39,9 +39,7 @@ public class RestaurantPromotionController {
 			model.addAttribute("products", promotionService.getAllProducts());
 		
 		if (!model.containsAttribute("locations")) {
-			model.addAttribute(
-			"locations",
-			promotionService.getAreasOfUSA(MarsConstants.USA, MarsConstants.COUNTRY));
+			model.addAttribute("locations", promotionService.getAreasOfUSA(false));
 			// Form doesn't need to show USA in the drop down menu.
 		}
 		
@@ -62,7 +60,7 @@ public class RestaurantPromotionController {
 		// Will need the following attributes in the model whether the form has error or not.
 		model.addAttribute("filterForm", new FilterForm());
 		model.addAttribute("products", promotionService.getAllProducts());
-		model.addAttribute("locations", promotionService.getAreasOfUSA(MarsConstants.USA, MarsConstants.COUNTRY));
+		model.addAttribute("locations", promotionService.getAreasOfUSA(false));
 		
 		if (result.hasErrors())
 			return MarsConstants.MARS_HOME_VIEW;
@@ -87,7 +85,7 @@ public class RestaurantPromotionController {
 		initializePromotionForm(promotionForm, promotionService.getPromotion(id));
 		
 		model.addAttribute("products", promotionService.getAllProducts());
-		model.addAttribute("locations", promotionService.getAreasOfUSA(MarsConstants.USA, MarsConstants.COUNTRY));
+		model.addAttribute("locations", promotionService.getAreasOfUSA(false));
 		model.addAttribute("promotionForm", promotionForm);
 		
 		return MarsConstants.MARS_EDIT_VIEW;
@@ -97,7 +95,7 @@ public class RestaurantPromotionController {
 	public String filter(@Valid FilterForm filterForm, BindingResult result, Model model) {
 		// Will need the following attributes in the model whether the form has error or not.
 		model.addAttribute("promotionForm", new PromotionForm());
-		model.addAttribute("locations", promotionService.getAreasOfUSA(MarsConstants.USA, MarsConstants.COUNTRY));
+		model.addAttribute("locations", promotionService.getAreasOfUSA(false));
 		model.addAttribute("products", promotionService.getAllProducts());
 		
 		if (result.hasErrors())
@@ -125,7 +123,7 @@ public class RestaurantPromotionController {
 	public String update(@Valid PromotionForm promoForm, BindingResult result, Model model) {
 		// Will need the following attributes in the model whether the form has error or not.
 		model.addAttribute("products", promotionService.getAllProducts());
-		model.addAttribute("locations", promotionService.getAreasOfUSA(MarsConstants.USA, MarsConstants.COUNTRY));
+		model.addAttribute("locations", promotionService.getAreasOfUSA(false));
 		
 		if (result.hasErrors())
 			return MarsConstants.MARS_EDIT_VIEW;
