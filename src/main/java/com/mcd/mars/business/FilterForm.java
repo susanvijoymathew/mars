@@ -2,10 +2,16 @@ package com.mcd.mars.business;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class FilterForm {
-	Date startDate;
-	Date endDate;
-	long location;
+	@DateTimeFormat(pattern="MM-dd-yyyy")
+	private Date startDate;
+	
+	@DateTimeFormat(pattern="MM-dd-yyyy")
+	private Date endDate;
+	
+	private long area;
 	
 	public FilterForm() {
 		this(null, null, -1);
@@ -14,7 +20,7 @@ public class FilterForm {
 	public FilterForm(Date startDate, Date endDate, long place) {
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.location = place;
+		this.area = place;
 	}
 
 	public Date getStartDate() {
@@ -33,11 +39,11 @@ public class FilterForm {
 		this.endDate = endDate;
 	}
 
-	public long getLocation() {
-		return location;
+	public long getArea() {
+		return area;
 	}
 
-	public void setLocation(long place) {
-		this.location = place;
+	public void setArea(long place) {
+		this.area = place;
 	}
 }
